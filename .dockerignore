@@ -1,0 +1,13 @@
+node_modules
+.git
+.gitignore
+README.md
+.env
+.env.local
+.env.production
+dist
+coverage
+.nyc_output
+.replit
+replit.nix
+attached_assets

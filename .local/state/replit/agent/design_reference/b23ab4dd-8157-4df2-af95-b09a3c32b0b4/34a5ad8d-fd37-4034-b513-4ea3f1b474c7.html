@@ -1,0 +1,895 @@
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doorway - Ejendomsadministration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af'
+                        },
+                        gray: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- @COMPONENT: AppLayout -->
+    <div class="min-h-screen">
+        <!-- @COMPONENT: TopBar -->
+        <header class="bg-white border-b border-gray-200 h-16 fixed top-0 left-0 right-0 z-30">
+            <div class="flex items-center justify-between h-full px-6">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-door-open text-white text-sm"></i>
+                    </div>
+                    <span class="ml-3 text-xl font-semibold text-gray-900">Doorway</span>
+                </div>
+
+                <!-- Search -->
+                <div class="flex-1 max-w-md mx-8">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input 
+                            type="text" 
+                            placeholder="Søg..." 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            data-implementation="Implement search functionality"
+                        >
+                    </div>
+                </div>
+
+                <!-- Avatar Menu -->
+                <div class="relative">
+                    <!-- @STATE: dropdownOpen:boolean = false -->
+                    <button 
+                        id="avatar-button"
+                        class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        data-event="click:toggleDropdown"
+                    >
+                        <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-medium" data-bind="user.initials">AA</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700" data-bind="user.name">Admin Administrator</span>
+                        <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div 
+                        id="avatar-dropdown"
+                        class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden"
+                        data-dropdown="true"
+                    >
+                        <div class="py-1">
+                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" data-route="/profile">
+                                <i class="fas fa-user w-4 mr-3 text-gray-400"></i>
+                                Min profil
+                            </a>
+                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" data-route="/change-password">
+                                <i class="fas fa-key w-4 mr-3 text-gray-400"></i>
+                                Skift adgangskode
+                            </a>
+                            <hr class="my-1 border-gray-200">
+                            <button class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50" data-event="click:logout">
+                                <i class="fas fa-sign-out-alt w-4 mr-3"></i>
+                                Log ud
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- @END_COMPONENT: TopBar -->
+
+        <!-- @COMPONENT: Sidebar -->
+        <aside class="bg-white border-r border-gray-200 w-60 fixed left-0 top-16 bottom-0 z-20">
+            <nav class="p-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a 
+                            href="#" 
+                            class="flex items-center px-3 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg"
+                            data-route="/dashboard"
+                            data-active="true"
+                        >
+                            <i class="fas fa-chart-pie w-5 mr-3"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                            href="#" 
+                            class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg"
+                            data-route="/properties"
+                        >
+                            <i class="fas fa-building w-5 mr-3"></i>
+                            Ejendomme
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- @COMPONENT: MainContent -->
+        <main class="ml-60 mt-16 p-6">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="dashboard-view">
+                <!-- @COMPONENT: DashboardHeader -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+                    <p class="text-gray-600 mt-1">Oversigt over dine ejendomme og nøgletal</p>
+                </div>
+                <!-- @END_COMPONENT: DashboardHeader -->
+
+                <!-- @COMPONENT: DashboardStats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Property Count Card -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-building text-blue-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Antal ejendomme</p>
+                                <p class="text-2xl font-semibold text-gray-900" data-bind="stats.propertyCount">5</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Acquisition Value Card -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-line text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Total anskaffelsessum</p>
+                                <p class="text-2xl font-semibold text-gray-900" data-bind="stats.totalValue">12.450.000 kr</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Property Card -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-purple-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Senest oprettede</p>
+                                <p class="text-lg font-semibold text-gray-900" data-bind="stats.latestProperty.name">Strandvejen 15</p>
+                                <p class="text-sm text-gray-500" data-bind="stats.latestProperty.city">København</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: DashboardStats -->
+
+                <!-- @COMPONENT: RecentActivity -->
+                <div class="bg-white rounded-xl border border-gray-200">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900">Seneste aktivitet</h2>
+                    </div>
+                    <div class="p-6">
+                        <!-- @MAP: activities.map(activity => ( -->
+                        <div class="flex items-center space-x-4 mb-4 last:mb-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-plus text-blue-600 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-900">
+                                    <span class="font-medium" data-bind="activity.propertyName">Østerbrogade 42</span> blev oprettet
+                                </p>
+                                <p class="text-xs text-gray-500" data-bind="activity.timestamp">2 timer siden</p>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: RecentActivity -->
+
+                <!-- Empty State (shown when no properties exist) -->
+                <div id="dashboard-empty-state" class="hidden text-center py-12">
+                    <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-building text-gray-400 text-3xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Ingen ejendomme endnu</h3>
+                    <p class="text-gray-600 mb-6 max-w-sm mx-auto">Kom i gang ved at oprette din første ejendom og se dine nøgletal her.</p>
+                    <button 
+                        class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                        data-event="click:createFirstProperty"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Opret første ejendom
+                    </button>
+                </div>
+            </div>
+
+            <!-- Properties List View -->
+            <div id="properties-view" class="properties-view hidden">
+                <!-- @COMPONENT: PropertiesHeader -->
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-900">Ejendomme</h1>
+                        <p class="text-gray-600 mt-1">Administrer og overvåg dine ejendomme</p>
+                    </div>
+                    <button 
+                        class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                        data-event="click:createProperty"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Opret ejendom
+                    </button>
+                </div>
+                <!-- @END_COMPONENT: PropertiesHeader -->
+
+                <!-- @COMPONENT: PropertiesTable -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Navn</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adresse</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Postnr/By</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Anskaffelsessum</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Handlinger</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <!-- @MAP: properties.map(property => ( -->
+                                <tr data-mock="true">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-medium text-gray-900" data-bind="property.name">Strandvejen 15</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-gray-900" data-bind="property.address">Strandvejen 15, 3. th</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-gray-900">
+                                            <span data-bind="property.postal_code">2100</span> <span data-bind="property.city">København Ø</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full" data-bind="property.type">Ejerlejlighed</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-gray-900" data-bind="property.acquisition_price">2.450.000 kr</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <button class="text-gray-400 hover:text-gray-600" data-event="click:viewProperty" data-tooltip="Vis">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-400 hover:text-gray-600" data-event="click:editProperty" data-tooltip="Redigér">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-400 hover:text-red-600" data-event="click:deleteProperty" data-tooltip="Slet">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- @END_MAP )) -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: PropertiesTable -->
+
+                <!-- Empty State (shown when no properties exist) -->
+                <div id="properties-empty-state" class="hidden bg-white rounded-xl border border-gray-200 text-center py-12">
+                    <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-building text-gray-400 text-3xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Ingen ejendomme endnu</h3>
+                    <p class="text-gray-600 mb-6 max-w-sm mx-auto">Kom i gang ved at oprette din første ejendom. Du kan tilføje alle relevante oplysninger og spore værdien over tid.</p>
+                    <button 
+                        class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                        data-event="click:createProperty"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Opret ejendom
+                    </button>
+                </div>
+            </div>
+
+            <!-- Property Form Modal -->
+            <div id="property-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <!-- @COMPONENT: PropertyForm -->
+                <div class="bg-white rounded-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-semibold text-gray-900" id="modal-title">Opret ejendom</h2>
+                            <button class="text-gray-400 hover:text-gray-600" data-event="click:closeModal">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <form class="p-6" data-event="submit:saveProperty">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Property Name -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ejendomsnavn *</label>
+                                <input 
+                                    type="text" 
+                                    required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    placeholder="F.eks. Strandvejen 15, 3. th"
+                                    data-bind="form.name"
+                                >
+                            </div>
+
+                            <!-- Address -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Adresse *</label>
+                                <input 
+                                    type="text" 
+                                    required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    placeholder="Indtast den fulde adresse"
+                                    data-bind="form.address"
+                                >
+                            </div>
+
+                            <!-- Postal Code -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Postnummer *</label>
+                                <input 
+                                    type="text" 
+                                    required
+                                    pattern="[0-9]{4}"
+                                    maxlength="4"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    placeholder="2100"
+                                    data-bind="form.postal_code"
+                                    data-event="input:lookupCity"
+                                >
+                            </div>
+
+                            <!-- City -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">By *</label>
+                                <input 
+                                    type="text" 
+                                    required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    placeholder="Autoudfyldes fra postnummer"
+                                    data-bind="form.city"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Udfyldes automatisk, men kan overskrives</p>
+                            </div>
+
+                            <!-- Property Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ejendomstype *</label>
+                                <select 
+                                    required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    data-bind="form.property_type"
+                                    data-event="change:toggleShareFields"
+                                >
+                                    <option value="">Vælg type</option>
+                                    <option value="ejerlejlighed">Ejerlejlighed</option>
+                                    <option value="samlet_fast_ejendom">Samlet Fast Ejendom</option>
+                                </select>
+                            </div>
+
+                            <!-- Acquisition Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Anskaffelsessum *</label>
+                                <div class="relative">
+                                    <input 
+                                        type="number" 
+                                        required
+                                        min="0"
+                                        step="1000"
+                                        class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        placeholder="2450000"
+                                        data-bind="form.acquisition_price"
+                                    >
+                                    <span class="absolute right-3 top-2 text-gray-500 text-sm">kr</span>
+                                </div>
+                            </div>
+
+                            <!-- Acquisition Date -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Anskaffelsesdato</label>
+                                <input 
+                                    type="date" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    data-bind="form.acquisition_date"
+                                >
+                            </div>
+
+                            <!-- Share Numbers (only for condominiums) -->
+                            <div id="share-fields" class="md:col-span-2 hidden">
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <h3 class="text-sm font-medium text-blue-900 mb-3">Fordelingstal (kun for ejerlejligheder)</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-blue-800 mb-2">Tæller *</label>
+                                            <input 
+                                                type="number" 
+                                                min="1"
+                                                class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                placeholder="192"
+                                                data-bind="form.share_numerator"
+                                                data-conditional-required="property_type:ejerlejlighed"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-blue-800 mb-2">Nævner *</label>
+                                            <input 
+                                                type="number" 
+                                                min="1"
+                                                class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                placeholder="2384"
+                                                data-bind="form.share_denominator"
+                                                data-conditional-required="property_type:ejerlejlighed"
+                                            >
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-blue-700 mt-2">Begge felter skal udfyldes hvis ejendommen er en ejerlejlighed</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex items-center justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+                            <button 
+                                type="button" 
+                                class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                data-event="click:closeModal"
+                            >
+                                Annuller
+                            </button>
+                            <button 
+                                type="submit" 
+                                class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                            >
+                                Gem ejendom
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- @END_COMPONENT: PropertyForm -->
+            </div>
+
+            <!-- Property Detail View -->
+            <div id="property-detail-view" class="property-detail-view hidden">
+                <!-- @COMPONENT: PropertyDetail -->
+                <div class="mb-6">
+                    <button class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4" data-event="click:backToList">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Tilbage til ejendomme
+                    </button>
+                    <h1 class="text-2xl font-semibold text-gray-900" data-bind="property.name">Strandvejen 15, 3. th</h1>
+                    <p class="text-gray-600" data-bind="property.address">Strandvejen 15, 3. th, 2100 København Ø</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Main Details -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl border border-gray-200 p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-6">Ejendomsoplysninger</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Ejendomsnavn</label>
+                                    <p class="text-gray-900" data-bind="property.name">Strandvejen 15, 3. th</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Ejendomstype</label>
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full" data-bind="property.type">Ejerlejlighed</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Adresse</label>
+                                    <p class="text-gray-900" data-bind="property.address">Strandvejen 15, 3. th</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Postnummer og by</label>
+                                    <p class="text-gray-900"><span data-bind="property.postal_code">2100</span> <span data-bind="property.city">København Ø</span></p>
+                                </div>
+                                <div id="share-display" class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Fordelingstal</label>
+                                    <p class="text-gray-900" data-bind="property.share_display">192 af 2384</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Info -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-xl border border-gray-200 p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-6">Økonomiske oplysninger</h2>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Anskaffelsessum</label>
+                                    <p class="text-2xl font-semibold text-gray-900" data-bind="property.acquisition_price">2.450.000 kr</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1">Anskaffelsesdato</label>
+                                    <p class="text-gray-900" data-bind="property.acquisition_date">15. marts 2023</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="mt-6 space-y-2">
+                            <button class="w-full flex items-center justify-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors" data-event="click:editProperty">
+                                <i class="fas fa-edit mr-2"></i>
+                                Redigér ejendom
+                            </button>
+                            <button class="w-full flex items-center justify-center px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors" data-event="click:deleteProperty">
+                                <i class="fas fa-trash mr-2"></i>
+                                Slet ejendom
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: PropertyDetail -->
+            </div>
+
+            <!-- Profile View -->
+            <div id="profile-view" class="profile-view hidden">
+                <!-- @COMPONENT: ProfileForm -->
+                <div class="max-w-2xl">
+                    <div class="mb-8">
+                        <h1 class="text-2xl font-semibold text-gray-900">Min profil</h1>
+                        <p class="text-gray-600 mt-1">Administrer dine brugeroplysninger</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <form data-event="submit:saveProfile">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Navn *</label>
+                                    <input 
+                                        type="text" 
+                                        required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        value="Admin Administrator"
+                                        data-bind="user.name"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">E-mail *</label>
+                                    <input 
+                                        type="email" 
+                                        required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        value="admin@doorway.dk"
+                                        data-bind="user.email"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-end mt-8 pt-6 border-t border-gray-200">
+                                <button 
+                                    type="submit" 
+                                    class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                                >
+                                    Gem ændringer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ProfileForm -->
+            </div>
+
+            <!-- Change Password View -->
+            <div id="change-password-view" class="change-password-view hidden">
+                <!-- @COMPONENT: ChangePasswordForm -->
+                <div class="max-w-2xl">
+                    <div class="mb-8">
+                        <h1 class="text-2xl font-semibold text-gray-900">Skift adgangskode</h1>
+                        <p class="text-gray-600 mt-1">Opdater din adgangskode for øget sikkerhed</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <form data-event="submit:changePassword">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nuværende adgangskode *</label>
+                                    <input 
+                                        type="password" 
+                                        required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        data-bind="passwordForm.current"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ny adgangskode *</label>
+                                    <input 
+                                        type="password" 
+                                        required
+                                        minlength="8"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        data-bind="passwordForm.new"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Bekræft ny adgangskode *</label>
+                                    <input 
+                                        type="password" 
+                                        required
+                                        minlength="8"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        data-bind="passwordForm.confirm"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+                                <button 
+                                    type="button" 
+                                    class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    data-event="click:cancelPasswordChange"
+                                >
+                                    Annuller
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                                >
+                                    Skift adgangskode
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ChangePasswordForm -->
+            </div>
+
+            <!-- First-time Setup View -->
+            <div id="setup-view" class="setup-view hidden">
+                <!-- @COMPONENT: SetupWizard -->
+                <div class="min-h-screen flex items-center justify-center">
+                    <div class="max-w-md w-full">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 bg-primary-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-door-open text-white text-2xl"></i>
+                            </div>
+                            <h1 class="text-2xl font-semibold text-gray-900">Velkommen til Doorway</h1>
+                            <p class="text-gray-600 mt-2">Opret den første administrator for at komme i gang</p>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-gray-200 p-6">
+                            <form data-event="submit:createFirstAdmin">
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Fulde navn *</label>
+                                        <input 
+                                            type="text" 
+                                            required
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                            placeholder="Dit fulde navn"
+                                            data-bind="setup.name"
+                                        >
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">E-mail adresse *</label>
+                                        <input 
+                                            type="email" 
+                                            required
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                            placeholder="din@email.dk"
+                                            data-bind="setup.email"
+                                        >
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Adgangskode *</label>
+                                        <input 
+                                            type="password" 
+                                            required
+                                            minlength="8"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                            placeholder="Minimum 8 tegn"
+                                            data-bind="setup.password"
+                                        >
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Bekræft adgangskode *</label>
+                                        <input 
+                                            type="password" 
+                                            required
+                                            minlength="8"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                            placeholder="Gentag adgangskode"
+                                            data-bind="setup.confirmPassword"
+                                        >
+                                    </div>
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    class="w-full mt-8 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                                >
+                                    Opret administrator
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: SetupWizard -->
+            </div>
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+    </div>
+    <!-- @END_COMPONENT: AppLayout -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        (function() {
+            // Basic UI interactions for demo purposes
+            // In production, this would be replaced with React components and proper state management
+
+            // Avatar dropdown toggle
+            const avatarButton = document.getElementById('avatar-button');
+            const avatarDropdown = document.getElementById('avatar-dropdown');
+            
+            if (avatarButton && avatarDropdown) {
+                avatarButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    avatarDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function() {
+                    avatarDropdown.classList.add('hidden');
+                });
+            }
+
+            // Navigation - Show/hide different views
+            function showView(viewId) {
+                const views = ['dashboard-view', 'properties-view', 'property-detail-view', 'profile-view', 'change-password-view', 'setup-view'];
+                views.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (id === viewId) {
+                            element.classList.remove('hidden');
+                        } else {
+                            element.classList.add('hidden');
+                        }
+                    }
+                });
+
+                // Update active navigation
+                const navLinks = document.querySelectorAll('aside a[data-route]');
+                navLinks.forEach(link => {
+                    const route = link.getAttribute('data-route');
+                    if ((route === '/dashboard' && viewId === 'dashboard-view') || 
+                        (route === '/properties' && viewId === 'properties-view')) {
+                        link.classList.add('text-primary-600', 'bg-primary-50');
+                        link.classList.remove('text-gray-600', 'hover:bg-gray-50');
+                    } else {
+                        link.classList.remove('text-primary-600', 'bg-primary-50');
+                        link.classList.add('text-gray-600', 'hover:bg-gray-50');
+                    }
+                });
+            }
+
+            // Add click handlers for navigation
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('[data-route]');
+                if (target) {
+                    e.preventDefault();
+                    const route = target.getAttribute('data-route');
+                    
+                    switch(route) {
+                        case '/dashboard':
+                            showView('dashboard-view');
+                            break;
+                        case '/properties':
+                            showView('properties-view');
+                            break;
+                        case '/profile':
+                            showView('profile-view');
+                            avatarDropdown.classList.add('hidden');
+                            break;
+                        case '/change-password':
+                            showView('change-password-view');
+                            avatarDropdown.classList.add('hidden');
+                            break;
+                    }
+                }
+            });
+
+            // Property type change handler for conditional fields
+            document.addEventListener('change', function(e) {
+                if (e.target.getAttribute('data-bind') === 'form.property_type') {
+                    const shareFields = document.getElementById('share-fields');
+                    if (shareFields) {
+                        if (e.target.value === 'ejerlejlighed') {
+                            shareFields.classList.remove('hidden');
+                        } else {
+                            shareFields.classList.add('hidden');
+                        }
+                    }
+                }
+            });
+
+            // Modal controls
+            const propertyModal = document.getElementById('property-modal');
+            
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('[data-event*="createProperty"]') || 
+                    e.target.closest('[data-event*="createProperty"]')) {
+                    if (propertyModal) {
+                        propertyModal.classList.remove('hidden');
+                        document.getElementById('modal-title').textContent = 'Opret ejendom';
+                    }
+                }
+                
+                if (e.target.matches('[data-event*="closeModal"]') || 
+                    e.target.closest('[data-event*="closeModal"]')) {
+                    if (propertyModal) {
+                        propertyModal.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Postal code lookup simulation
+            document.addEventListener('input', function(e) {
+                if (e.target.getAttribute('data-event') === 'input:lookupCity') {
+                    const postalCode = e.target.value;
+                    const cityField = document.querySelector('[data-bind="form.city"]');
+                    
+                    // Simulated Danish postal code lookup
+                    const postalCodes = {
+                        '1000': 'København K',
+                        '2100': 'København Ø',
+                        '2200': 'København N',
+                        '2720': 'Vanløse',
+                        '8000': 'Aarhus C',
+                        '5000': 'Odense C'
+                    };
+                    
+                    if (cityField && postalCodes[postalCode]) {
+                        cityField.value = postalCodes[postalCode];
+                    }
+                }
+            });
+
+            // Show dashboard view by default
+            showView('dashboard-view');
+        })();
+    </script>
+</body>
+</html>

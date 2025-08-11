@@ -1,0 +1,26 @@
+name: doorway-property-management
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: your-username/your-repo-name
+    branch: main
+    deploy_on_push: true
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 5000
+  routes:
+  - path: /
+  envs:
+  - key: NODE_ENV
+    value: "production"
+  - key: DATABASE_URL
+    value: "${db.DATABASE_URL}"
+    type: SECRET
+databases:
+- name: db
+  engine: PG
+  version: "14"
+  size: db-s-dev-database
