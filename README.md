@@ -72,4 +72,4 @@ Projektet er konfigureret til Digital Ocean App Platform. Se `deploy-guide.md` f
 
 ## License
 
-MIT License
+MIT License# Deployment trigger Man 11 Aug 2025 23:05:45 CEST
