@@ -61,7 +61,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   // Digital Ocean port
-  const port = parseInt(process.env.PORT || process.env.HTTP_PORT || '5000', 10);
+  const port = parseInt(process.env.PORT || process.env.HTTP_PORT || '8080', 10);
   server.listen({
     port,
     host: "0.0.0.0",
