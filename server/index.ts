@@ -69,4 +69,12 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port} - postal codes embedded`);
   });
+
+    
+  console.log('Environment check:', {
+    NODE_ENV: process.env.NODE_ENV,
+    PORT: process.env.PORT,
+    DATABASE_URL: process.env.DATABASE_URL ? 'set' : 'MISSING'
+  });
+  
 })();
