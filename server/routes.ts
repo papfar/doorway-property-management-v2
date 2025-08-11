@@ -43,6 +43,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Health check endpoint for debugging (no database required)
+  app.get('/api/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      port: process.env.PORT || 'not set'
+    });
+  });
+
+  // Simple test endpoint
+  app.get('/test', (req, res) => {
+    res.json({ 
+      message: 'Server responding without database',
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        PORT: process.env.PORT,
+        DATABASE_URL: process.env.DATABASE_URL ? 'set' : 'missing'
+      }
+    });
+  });
+
   // Check if setup is needed - always allow new organizations
   app.get('/api/setup/needed', async (req, res) => {
     try {
