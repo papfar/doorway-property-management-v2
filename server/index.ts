@@ -60,6 +60,7 @@ app.use((req, res, next) => {
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
+  // Digital Ocean port
   const port = parseInt(process.env.PORT || process.env.HTTP_PORT || '5000', 10);
   server.listen({
     port,
