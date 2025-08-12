@@ -7,7 +7,7 @@ services:
     branch: main
     deploy_on_push: true
   run_command: npm start
-  build_command: npm run build  # Vigtig - sikrer frontend bygges
+  build_command: npm run build && mkdir -p dist && cp -r dist/public/* dist/ 
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
