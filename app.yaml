@@ -7,7 +7,16 @@ services:
     branch: main
     deploy_on_push: true
   run_command: npm start
-  build_command: npm run build && mkdir -p dist && cp -r dist/public/* dist/ 
+  build_command: |
+    npm run build
+    echo "=== Build directory contents ==="
+    ls -la dist/
+    echo "=== Public directory contents ==="
+    ls -la dist/public/ || echo "No public dir"
+    echo "=== Creating public symlink ==="
+    ln -sf /workspace/dist/public /workspace/dist/public || true
+    echo "=== Final check ==="
+    ls -la dist/
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
